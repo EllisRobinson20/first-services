@@ -7,33 +7,23 @@ import android.util.Log
 
 class MyFirstService : Service() {
     var Tag:String = "MyFirstService"
-    private var serviceLooper: Looper? = null
-    private var serviceHandler: Handler? = null
+    private val myBinder = MyBinder()
 
     override fun onBind(intent: Intent): IBinder? {
         Log.i(Tag, "onBind")
-        return null
+        return myBinder
+    }
+    fun getResult(Counter:Int): Int {
+        return Counter * 10
     }
 
-    override fun onCreate() {
-        Log.i(Tag, "onCreate")
-        super.onCreate()
-        HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND).
-        start()
-        serviceLooper = mainLooper
-        serviceHandler = ServiceHandler(mainLooper)
-
-
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.i(Tag, "onStartCommand")
-        serviceHandler?.obtainMessage()?.also { msg ->
-            msg.arg1=startId
-            serviceHandler?.sendMessage(msg)
+    inner class MyBinder: Binder() {
+        fun getService() : MyFirstService {
+            return this@MyFirstService
         }
-        return START_STICKY //super.onStartCommand(intent, flags, startId)
     }
+
+
 
     override fun onDestroy() {
         Log.i(Tag, "onDestroy")
